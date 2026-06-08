@@ -1,0 +1,45 @@
+# Microsoft Exchange 2010 sends uppercase MAILTO in URIs.
+# This tests that MAILTO: is handled case-insensitively.
+
+# Incoming invitation from Exchange to alice
+> itip john.doe@big-corp.com alice@example.com
+BEGIN:VCALENDAR
+METHOD:REQUEST
+PRODID:Microsoft Exchange Server 2010
+VERSION:2.0
+BEGIN:VEVENT
+ORGANIZER;CN=John Doe:MAILTO:john.doe@big-corp.com
+ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN='alice@exam
+ ple.com':MAILTO:alice@example.com
+DTSTAMP:19970611T190000Z
+DTSTART:19970701T200000Z
+DTEND:19970701T2100000Z
+SUMMARY:Conference
+UID:exchange-uppercase-mailto-test@example.com
+SEQUENCE:0
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR
+
+# Deliver to alice - should succeed (no response messages expected)
+> send
+
+# Verify alice has the event in her calendar
+> get alice@example.com exchange-uppercase-mailto-test@example.com
+BEGIN:VCALENDAR
+PRODID:Microsoft Exchange Server 2010
+VERSION:2.0
+BEGIN:VEVENT
+STATUS:CONFIRMED
+SUMMARY:Conference
+DTEND:19970701T2100000Z
+DTSTART:19970701T200000Z
+ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN='alice@exa
+ mple.com':MAILTO:alice@example.com
+ORGANIZER;CN="John Doe":MAILTO:john.doe@big-corp.com
+UID:exchange-uppercase-mailto-test@example.com
+DTSTAMP:0
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR
+

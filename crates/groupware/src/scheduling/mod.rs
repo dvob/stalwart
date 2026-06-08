@@ -238,7 +238,12 @@ impl Attendee<'_> {
 impl Email {
     pub fn new(email: &str, local_addresses: &[String]) -> Option<Self> {
         email.contains('@').then(|| {
-            let email = email.trim().trim_start_matches("mailto:").to_lowercase();
+            let email = email.trim();
+            let email = if email.len() > 7 && email.as_bytes()[..7].eq_ignore_ascii_case(b"mailto:") {
+                &email[7..]
+            } else {
+                email
+            }.to_lowercase();
             let is_local = local_addresses.contains(&email);
             Email { email, is_local }
         })
